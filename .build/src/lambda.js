@@ -20,6 +20,7 @@ const aws_serverless_express_1 = require("aws-serverless-express");
 const helmet_1 = __importDefault(require("helmet"));
 const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
+const prisma_client_exception_filter_1 = require("./prisma-client-exception/prisma-client-exception.filter");
 let cachedServer;
 function bootstrapServer() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -37,6 +38,8 @@ function bootstrapServer() {
             .build();
         const document = swagger_1.SwaggerModule.createDocument(app, config);
         swagger_1.SwaggerModule.setup('apidocs', app, document);
+        const { httpAdapter } = app.get(core_1.HttpAdapterHost);
+        app.useGlobalFilters(new prisma_client_exception_filter_1.PrismaClientExceptionFilter(httpAdapter));
         yield app.init();
         return (0, aws_serverless_express_1.createServer)(expressApp);
     });

@@ -28,7 +28,7 @@ custom:
 
 functions:
   main:
-    handler: src/lambda.handler
+    handler: src/main.handler
     events:
       - http:
           method: any
