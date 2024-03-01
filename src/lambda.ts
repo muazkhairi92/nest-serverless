@@ -4,6 +4,9 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from "./app.module";
 import { Response, createServer, proxy } from "aws-serverless-express";
 import { Context, Handler } from "aws-lambda";
+import helmet from 'helmet';
+import { ValidationPipe } from "@nestjs/common";
+import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
 
 
@@ -14,6 +17,19 @@ async function bootstrapServer(): Promise<Server> {
   const adapter = new ExpressAdapter(expressApp);
   const app = await NestFactory.create(AppModule, adapter);
   app.enableCors();
+  app.use(helmet());
+
+  app.useGlobalPipes(new ValidationPipe( {whitelist: true }));
+
+  const config = new DocumentBuilder()
+  .setTitle('Api docs example')
+  .setDescription('The post API description')
+  .setVersion('1.0')
+  .addTag('post')
+  .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('apidocs', app, document);
+
   await app.init();
   return createServer(expressApp);
 }

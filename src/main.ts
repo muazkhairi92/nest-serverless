@@ -5,6 +5,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { PrismaClientExceptionFilter } from './prisma-client-exception/prisma-client-exception.filter';
 import { Callback, Context, Handler } from 'aws-lambda';
 import serverlessExpress from '@codegenie/serverless-express';
+import helmet from 'helmet';
 
 
 let server: Handler;
@@ -13,7 +14,9 @@ let server: Handler;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.init();
-  
+  app.enableCors();
+  app.use(helmet());
+
   app.useGlobalPipes(new ValidationPipe( {whitelist: true }));
 
   const config = new DocumentBuilder()
@@ -31,17 +34,7 @@ async function bootstrap() {
   await app.listen(3000);
 
 
-  // const expressApp = app.getHttpAdapter().getInstance();
-  // return serverlessExpress({ app: expressApp });
-
 }
 bootstrap();
 
-// export const handler: Handler = async (
-//   event: any,
-//   context: Context,
-//   callback: Callback,
-// ) => {
-//   server = server ?? (await bootstrap());
-//   return server(event, context, callback);
-// };
+

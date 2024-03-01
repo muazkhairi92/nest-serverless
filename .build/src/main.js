@@ -8,17 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const core_1 = require("@nestjs/core");
 const app_module_1 = require("./app.module");
 const swagger_1 = require("@nestjs/swagger");
 const common_1 = require("@nestjs/common");
 const prisma_client_exception_filter_1 = require("./prisma-client-exception/prisma-client-exception.filter");
+const helmet_1 = __importDefault(require("helmet"));
 let server;
 function bootstrap() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);
         yield app.init();
+        app.enableCors();
+        app.use((0, helmet_1.default)());
         app.useGlobalPipes(new common_1.ValidationPipe({ whitelist: true }));
         const config = new swagger_1.DocumentBuilder()
             .setTitle('Api docs example')
